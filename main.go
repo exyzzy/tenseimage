@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/exyzzy/tenseimage/match"
@@ -65,13 +66,17 @@ func (app *application) homeHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+	scheme := "https://"
+	if strings.Contains(r.Host, "localhost") {
+		scheme = ""
+	}
 
 	switch r.Method {
 	case http.MethodGet: //just print available api calls
 		fmt.Fprintf(w, "environment: %s\n", app.config.env)
 		fmt.Fprintln(w, "you can use:")
-		fmt.Fprintf(w, "\tcurl -X OPTIONS %s/match -i\n", r.Host)
-		fmt.Fprintf(w, "\tcurl -d '{\"Url\":\"https://www.ndow.org/wp-content/uploads/2021/10/neovison_vison-992x679.jpg\"}' -H \"Content-Type: application/json\" -X POST %s/match\n", r.Host)
+		fmt.Fprintf(w, "\tcurl -X OPTIONS %s%s/match -i\n", scheme, r.Host)
+		fmt.Fprintf(w, "\tcurl -d '{\"Url\":\"https://www.ndow.org/wp-content/uploads/2021/10/neovison_vison-992x679.jpg\"}' -H \"Content-Type: application/json\" -X POST %s%s/match\n", scheme, r.Host)
 
 	case http.MethodOptions:
 		w.Header().Set("Allow", "GET, OPTIONS")
